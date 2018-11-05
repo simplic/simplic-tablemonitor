@@ -99,6 +99,10 @@ namespace Simplic.TableMonitor.Service
 
                         DataChanged?.Invoke(this, new AffectedRowEventArgs { TableName = data.TableName, Row = row });
                     }
+                    else
+                    {
+                        existingData.Updated = true;
+                    }
                 }
 
                 // Create copy of rows
