@@ -14,7 +14,7 @@ namespace Simplic.TableMonitor.Data.DB
     /// <summary>
     /// Repository implementation
     /// </summary>
-    public class TableMonitorRepository : SqlRepositoryBase<string, TableMonitorData>
+    public class TableMonitorRepository : SqlRepositoryBase<string, TableMonitorData>, ITableMonitorRepository
     {
         /// <summary>
         /// Initialize service
