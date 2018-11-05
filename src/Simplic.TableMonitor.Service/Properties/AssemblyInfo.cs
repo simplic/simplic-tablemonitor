@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Simplic.TableMonitor.Service")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Simplic.TableMonitor")]
+[assembly: AssemblyDescription("Simlpic table monitor")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Simplic.TableMonitor.Service")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCompany("SIMPLIC GmbH")]
+[assembly: AssemblyProduct("Simplic.TableMonitor")]
+[assembly: AssemblyCopyright("Copyright © SIMPLIC GmbH 2018")]
+[assembly: AssemblyTrademark("SIMPLIC GmbH Table Monitor")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
