@@ -64,7 +64,10 @@ namespace Simplic.TableMonitor.Service
                 columns = connection.Query<string>("SELECT cname FROM sys.syscolumns WHERE tname = :tableName ORDER BY cname", new { tableName = data.TableName }).ToList();
 
                 var statement = $"SELECT string({string.Join(",", primaryKeyNames)}) as primary_key_column, {string.Join(",", columns)} FROM {data.TableName} ORDER BY {string.Join(",", primaryKeyNames)}";
-                foreach (var row in connection.Query<IDictionary<string, object>>(statement))
+
+                var enumerator = connection.Query(statement) as IEnumerable<IDictionary<string, object>>;
+
+                foreach (var row in enumerator)
                 {
                     var hash = GenerateHash(row);
                     var primaryKey = row["primary_key_column"]?.ToString();
@@ -83,6 +86,9 @@ namespace Simplic.TableMonitor.Service
                         };
 
                         DataAdded?.Invoke(this, new AffectedRowEventArgs { TableName = data.TableName, Row = row });
+
+                        // Add data
+                        data.Row.Add(existingData);
                     }
                     // Data changed
                     else if (hash != existingData.Hash)
@@ -177,6 +183,8 @@ namespace Simplic.TableMonitor.Service
         /// <returns>True if successfull</returns>
         public bool Save(TableMonitorData obj)
         {
+            obj.UpdateDateTime = DateTime.Now;
+
             return repository.Save(obj);
         }
     }
