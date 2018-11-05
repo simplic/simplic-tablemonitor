@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Simplic.TableMonitor
 {
@@ -37,6 +38,7 @@ namespace Simplic.TableMonitor
         /// <summary>
         /// Gets or sets whether the row was updated
         /// </summary>
+        [JsonIgnore]
         public bool Updated
         {
             get;
