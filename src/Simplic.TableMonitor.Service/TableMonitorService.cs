@@ -102,8 +102,7 @@ namespace Simplic.TableMonitor.Service
                 }
 
                 // Create copy of rows
-                var dataToRemove = data.Row.Where(x => !x.Updated).ToList();
-                foreach (var removedData in dataToRemove)
+                foreach (var removedData in data.Row.Where(x => !x.Updated))
                 {
                     // Invoke remove event
                     DataRemoved?.Invoke(this, new AffectedRowEventArgs
@@ -111,10 +110,10 @@ namespace Simplic.TableMonitor.Service
                         TableName = data.TableName,
                         Row = removedData.Row
                     });
-
-                    // Remove data from list
-                    data.Row.Remove(removedData);
                 }
+
+                // Just add updated rows
+                data.Row = data.Row.Where(x => x.Updated).ToList();
             });
         }
 
