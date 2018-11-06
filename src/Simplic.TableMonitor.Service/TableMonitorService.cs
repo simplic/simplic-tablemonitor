@@ -89,17 +89,21 @@ namespace Simplic.TableMonitor.Service
                     if (existingData == null)
                     {
                         // Filter primary keys
-                        var row = new Dictionary<string, object>(dapperRow.Where(x => primaryKeyNames.Any(y => y.ToLower() == x.Key.ToLower())).ToDictionary(y => y.Key, v => v.Value));
+                        var rowCopy = new Dictionary<string, object>(dapperRow);
+                        var row = dapperRow.Where(x => primaryKeyNames.Any(y => y.ToLower() == x.Key.ToLower())).ToDictionary(y => y.Key, v => v.Value);
 
                         existingData = new TableMonitorDataRow
                         {
                             Hash = hash,
                             Updated = true,
                             PrimaryKey = primaryKey,
+
+                            // Set row containting only pks
                             Row = row
                         };
 
-                        DataAdded?.Invoke(this, new AffectedRowEventArgs { TableName = data.TableName, Row = row });
+                        // Invoke event. All columns must be included here
+                        DataAdded?.Invoke(this, new AffectedRowEventArgs { TableName = data.TableName, Row = rowCopy });
 
                         // Add data
                         data.Row.Add(existingData);
@@ -108,13 +112,13 @@ namespace Simplic.TableMonitor.Service
                     else if (hash != existingData.Hash)
                     {
                         // Filter primary keys
-                        var row = new Dictionary<string, object>(dapperRow.Where(x => primaryKeyNames.Any(y => y.ToLower() == x.Key.ToLower())).ToDictionary(y => y.Key, v => v.Value));
-
+                        var rowCopy = new Dictionary<string, object>(dapperRow);
+                        
                         existingData.Hash = hash;
                         existingData.Updated = true;
-                        existingData.Row = row;
-
-                        DataChanged?.Invoke(this, new AffectedRowEventArgs { TableName = data.TableName, Row = row });
+                        
+                        // Invoke event. All columns must be included here
+                        DataChanged?.Invoke(this, new AffectedRowEventArgs { TableName = data.TableName, Row = rowCopy });
                     }
                     else
                     {
