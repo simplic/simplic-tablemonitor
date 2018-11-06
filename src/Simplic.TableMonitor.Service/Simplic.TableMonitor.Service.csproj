@@ -50,6 +50,9 @@
       <HintPath>..\packages\Simplic.Data.Sql.1.13.118.1029\lib\net451\Simplic.Data.Sql.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Simplic.Log">
+      <HintPath>..\..\..\simplic-framework\src\Simplic.Main\bin\Debug\Simplic.Log.dll</HintPath>
+    </Reference>
     <Reference Include="Simplic.Sql, Version=6.2.18.926, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Simplic.Sql.6.2.18.926\lib\net451\Simplic.Sql.dll</HintPath>
       <Private>True</Private>

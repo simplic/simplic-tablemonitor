@@ -65,6 +65,9 @@ namespace Simplic.TableMonitor.Service
                     throw new Exception($"The table {data.TableName} has no primary columns.");
 
                 columns = connection.Query<string>("SELECT cname FROM sys.syscolumns WHERE tname = :tableName ORDER BY cname", new { tableName = data.TableName }).ToList();
+                
+                foreach (var nonePrimaryKey in primaryKeyNames)
+                    Console.WriteLine($"Primary key: {nonePrimaryKey}");
 
                 var statement = $"SELECT string({string.Join(",", primaryKeyNames)}) as primary_key_column, {string.Join(",", columns)} FROM {data.TableName} ORDER BY {string.Join(",", primaryKeyNames)}";
 
@@ -72,18 +75,21 @@ namespace Simplic.TableMonitor.Service
 
                 foreach (var dapperRow in enumerator.Select(x => (IDictionary<string, object>)x))
                 {
-                    var hash = GenerateHash(dapperRow);
+                    // Get and remove pk
                     var primaryKey = dapperRow["primary_key_column"]?.ToString();
-
-                    // Remove pk
                     dapperRow.Remove("primary_key_column");
-
-                    var existingData = data.Row.FirstOrDefault(x => x.PrimaryKey == primaryKey);
                     
+                    // Generate hash
+                    var hash = GenerateHash(dapperRow);
+
+                    // Find row in existing data
+                    var existingData = data.Row.FirstOrDefault(x => x.PrimaryKey == primaryKey);
+
                     // Data not found
                     if (existingData == null)
                     {
-                        var row = new Dictionary<string, object>(dapperRow);
+                        // Filter primary keys
+                        var row = new Dictionary<string, object>(dapperRow.Where(x => primaryKeyNames.Any(y => y.ToLower() == x.Key.ToLower())).ToDictionary(y => y.Key, v => v.Value));
 
                         existingData = new TableMonitorDataRow
                         {
@@ -101,7 +107,8 @@ namespace Simplic.TableMonitor.Service
                     // Data changed
                     else if (hash != existingData.Hash)
                     {
-                        var row = new Dictionary<string, object>(dapperRow);
+                        // Filter primary keys
+                        var row = new Dictionary<string, object>(dapperRow.Where(x => primaryKeyNames.Any(y => y.ToLower() == x.Key.ToLower())).ToDictionary(y => y.Key, v => v.Value));
 
                         existingData.Hash = hash;
                         existingData.Updated = true;
