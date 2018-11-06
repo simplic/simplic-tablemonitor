@@ -19,6 +19,15 @@ namespace Simplic.TableMonitor
         }
 
         /// <summary>
+        /// Gets or sets a comma separated list of primary keys
+        /// </summary>
+        public string PrimaryKeys
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the create date time
         /// </summary>
         public DateTime CreateDateTime

@@ -56,7 +56,10 @@ namespace Simplic.TableMonitor.Service
             sqlService.OpenConnection((connection) =>
             {
                 primaryKeyNames = connection.Query<string>("SELECT cname FROM sys.syscolumns WHERE in_primary_key = 'Y' AND tname = :tableName ORDER BY cname", new { tableName = data.TableName }).ToList();
-                
+
+                if (!string.IsNullOrWhiteSpace(data.PrimaryKeys))
+                    primaryKeyNames.AddRange(data.PrimaryKeys.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()));
+
                 // Assert primary columns
                 if (!primaryKeyNames.Any())
                     throw new Exception($"The table {data.TableName} has no primary columns.");
