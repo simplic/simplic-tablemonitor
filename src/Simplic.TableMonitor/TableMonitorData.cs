@@ -58,7 +58,7 @@ namespace Simplic.TableMonitor
         /// Gets or sets the primary key configuration as byte-array
         /// </summary>
         [JsonIgnore]
-        public byte[] PrimaryKeyConfiguration
+        public byte[] Data
         {
             get;
             set;

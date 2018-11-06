@@ -43,7 +43,7 @@ namespace Simplic.TableMonitor.Data.DB
         /// <returns>True if successfull</returns>
         public override bool Save(TableMonitorData obj)
         {
-            obj.PrimaryKeyConfiguration = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(obj.Row));
+            obj.Data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(obj.Row));
 
             return base.Save(obj);
         }
@@ -59,9 +59,9 @@ namespace Simplic.TableMonitor.Data.DB
         {
             var data = base.GetByColumn<T>(columnName, id);
 
-            if (data?.PrimaryKeyConfiguration != null)
+            if (data?.Data != null)
             {
-                var json = Encoding.UTF8.GetString(data.PrimaryKeyConfiguration);
+                var json = Encoding.UTF8.GetString(data.Data);
                 data.Row = JsonConvert.DeserializeObject<IList<TableMonitorDataRow>>(json);
             }
 
@@ -79,9 +79,9 @@ namespace Simplic.TableMonitor.Data.DB
         {
             foreach (var data in base.GetAllByColumn<T>(columnName, id))
             {
-                if (data?.PrimaryKeyConfiguration != null)
+                if (data?.Data != null)
                 {
-                    var json = Encoding.UTF8.GetString(data.PrimaryKeyConfiguration);
+                    var json = Encoding.UTF8.GetString(data.Data);
                     data.Row = JsonConvert.DeserializeObject<IList<TableMonitorDataRow>>(json);
                 }
 
@@ -97,9 +97,9 @@ namespace Simplic.TableMonitor.Data.DB
         {
             foreach (var data in base.GetAll())
             {
-                if (data?.PrimaryKeyConfiguration != null)
+                if (data?.Data != null)
                 {
-                    var json = Encoding.UTF8.GetString(data.PrimaryKeyConfiguration);
+                    var json = Encoding.UTF8.GetString(data.Data);
                     data.Row = JsonConvert.DeserializeObject<IList<TableMonitorDataRow>>(json);
                 }
 
