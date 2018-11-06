@@ -4,6 +4,7 @@ using Simplic.Sql;
 using Dapper;
 using System.Linq;
 using Simplic.Security.Cryptography;
+using Simplic.Log;
 
 namespace Simplic.TableMonitor.Service
 {
@@ -65,80 +66,103 @@ namespace Simplic.TableMonitor.Service
                     throw new Exception($"The table {data.TableName} has no primary columns.");
 
                 columns = connection.Query<string>("SELECT cname FROM sys.syscolumns WHERE tname = :tableName ORDER BY cname", new { tableName = data.TableName }).ToList();
-                
+
                 foreach (var nonePrimaryKey in primaryKeyNames)
                     Console.WriteLine($"Primary key: {nonePrimaryKey}");
 
                 var statement = $"SELECT string({string.Join(",", primaryKeyNames)}) as primary_key_column, {string.Join(",", columns)} FROM {data.TableName} ORDER BY {string.Join(",", primaryKeyNames)}";
+                int counter = 0;
 
-                var enumerator = connection.Query(statement);
-
-                foreach (var dapperRow in enumerator.Select(x => (IDictionary<string, object>)x))
+                try
                 {
-                    // Get and remove pk
-                    var primaryKey = dapperRow["primary_key_column"]?.ToString();
-                    dapperRow.Remove("primary_key_column");
-                    
-                    // Generate hash
-                    var hash = GenerateHash(dapperRow);
+                    var enumerator = connection.Query(statement);
 
-                    // Find row in existing data
-                    var existingData = data.Row.FirstOrDefault(x => x.PrimaryKey == primaryKey);
-
-                    // Data not found
-                    if (existingData == null)
+                    foreach (var dapperRow in enumerator.Select(x => (IDictionary<string, object>)x))
                     {
-                        // Filter primary keys
-                        var rowCopy = new Dictionary<string, object>(dapperRow);
-                        var row = dapperRow.Where(x => primaryKeyNames.Any(y => y.ToLower() == x.Key.ToLower())).ToDictionary(y => y.Key, v => v.Value);
+                        counter++;
+                        if (counter % 100 == 0)
+                            Console.WriteLine($"Processed {data.TableName} data: {counter}");
 
-                        existingData = new TableMonitorDataRow
+                        // Get and remove pk
+                        var primaryKey = dapperRow["primary_key_column"]?.ToString();
+                        dapperRow.Remove("primary_key_column");
+
+                        // Generate hash
+                        var hash = GenerateHash(dapperRow);
+
+                        // Find row in existing data
+                        var existingData = data.Row.FirstOrDefault(x => x.PrimaryKey == primaryKey);
+
+                        // Data not found
+                        if (existingData == null)
                         {
-                            Hash = hash,
-                            Updated = true,
-                            PrimaryKey = primaryKey,
+                            // Filter primary keys
+                            var rowCopy = new Dictionary<string, object>(dapperRow);
+                            var row = dapperRow.Where(x => primaryKeyNames.Any(y => y.ToLower() == x.Key.ToLower())).ToDictionary(y => y.Key, v => v.Value);
 
-                            // Set row containting only pks
-                            Row = row
-                        };
+                            existingData = new TableMonitorDataRow
+                            {
+                                Hash = hash,
+                                Updated = true,
+                                PrimaryKey = primaryKey,
 
-                        // Invoke event. All columns must be included here
-                        DataAdded?.Invoke(this, new AffectedRowEventArgs { TableName = data.TableName, Row = rowCopy });
+                                // Set row containting only pks
+                                Row = row
+                            };
 
-                        // Add data
-                        data.Row.Add(existingData);
+                            // Invoke event. All columns must be included here
+                            DataAdded?.Invoke(this, new AffectedRowEventArgs { TableName = data.TableName, Row = rowCopy });
+
+                            // Add data
+                            data.Row.Add(existingData);
+                        }
+                        // Data changed
+                        else if (hash != existingData.Hash)
+                        {
+                            // Filter primary keys
+                            var rowCopy = new Dictionary<string, object>(dapperRow);
+
+                            existingData.Hash = hash;
+                            existingData.Updated = true;
+
+                            // Invoke event. All columns must be included here
+                            DataChanged?.Invoke(this, new AffectedRowEventArgs { TableName = data.TableName, Row = rowCopy });
+                        }
+                        else
+                        {
+                            existingData.Updated = true;
+                        }
                     }
-                    // Data changed
-                    else if (hash != existingData.Hash)
+
+                    Console.WriteLine($"Processed {data.TableName} data: {counter}");
+
+                    // Create copy of rows
+                    foreach (var removedData in data.Row.Where(x => !x.Updated))
                     {
-                        // Filter primary keys
-                        var rowCopy = new Dictionary<string, object>(dapperRow);
-                        
-                        existingData.Hash = hash;
-                        existingData.Updated = true;
-                        
-                        // Invoke event. All columns must be included here
-                        DataChanged?.Invoke(this, new AffectedRowEventArgs { TableName = data.TableName, Row = rowCopy });
+                        counter++;
+                        if (counter % 100 == 0)
+                            Console.WriteLine($"Processed {data.TableName} data: {counter}");
+
+                        // Invoke remove event
+                        DataRemoved?.Invoke(this, new AffectedRowEventArgs
+                        {
+                            TableName = data.TableName,
+                            Row = removedData.Row
+                        });
                     }
-                    else
-                    {
-                        existingData.Updated = true;
-                    }
+
+                    Console.WriteLine($"Processed {data.TableName} data: {counter}");
+
+                    // Just add updated rows
+                    data.Row = data.Row.Where(x => x.Updated).ToList();
                 }
-
-                // Create copy of rows
-                foreach (var removedData in data.Row.Where(x => !x.Updated))
+                catch (Exception ex)
                 {
-                    // Invoke remove event
-                    DataRemoved?.Invoke(this, new AffectedRowEventArgs
-                    {
-                        TableName = data.TableName,
-                        Row = removedData.Row
-                    });
-                }
+                    var message = $"Could not process data. Query-Statement: {statement}.\r\nFailed row: {counter}.\r\nPrimary keys: {string.Join(",", primaryKeyNames)}.\r\nColumns: {string.Join(",", columns)}";
+                    LogManagerInstance.Instance.Error($"Error in TableMonitorService.Process\r\n{message}");
 
-                // Just add updated rows
-                data.Row = data.Row.Where(x => x.Updated).ToList();
+                    throw new Exception(message, ex);
+                }
             });
         }
 
