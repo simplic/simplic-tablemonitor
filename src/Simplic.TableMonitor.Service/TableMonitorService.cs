@@ -75,8 +75,11 @@ namespace Simplic.TableMonitor.Service
                     var hash = GenerateHash(dapperRow);
                     var primaryKey = dapperRow["primary_key_column"]?.ToString();
 
-                    var existingData = data.Row.FirstOrDefault(x => x.PrimaryKey == primaryKey);
+                    // Remove pk
+                    dapperRow.Remove("primary_key_column");
 
+                    var existingData = data.Row.FirstOrDefault(x => x.PrimaryKey == primaryKey);
+                    
                     // Data not found
                     if (existingData == null)
                     {
