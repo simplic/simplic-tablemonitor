@@ -16,8 +16,6 @@ namespace Simplic.TableMonitor.Data.DB
     /// </summary>
     public class TableMonitorRepository : SqlRepositoryBase<string, TableMonitorData>, ITableMonitorRepository
     {
-        private JsonSerializerSettings settings;
-
         /// <summary>
         /// Initialize service
         /// </summary>
@@ -26,10 +24,7 @@ namespace Simplic.TableMonitor.Data.DB
         /// <param name="cacheService">Cache service instance</param>
         public TableMonitorRepository(ISqlService sqlService, ISqlColumnService sqlColumnService, ICacheService cacheService) : base(sqlService, sqlColumnService, cacheService)
         {
-            settings = new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.All
-            };
+            
         }
 
         /// <summary>
@@ -49,7 +44,7 @@ namespace Simplic.TableMonitor.Data.DB
         /// <returns>True if successfull</returns>
         public override bool Save(TableMonitorData obj)
         {
-            obj.Data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(obj.Row, settings));
+            obj.Data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(obj.Row));
 
             return base.Save(obj);
         }
@@ -68,7 +63,7 @@ namespace Simplic.TableMonitor.Data.DB
             if (data?.Data != null)
             {
                 var json = Encoding.UTF8.GetString(data.Data);
-                data.Row = JsonConvert.DeserializeObject<IList<TableMonitorDataRow>>(json, settings);
+                data.Row = JsonConvert.DeserializeObject<IList<TableMonitorDataRow>>(json);
             }
 
             return data;
@@ -88,7 +83,7 @@ namespace Simplic.TableMonitor.Data.DB
                 if (data?.Data != null)
                 {
                     var json = Encoding.UTF8.GetString(data.Data);
-                    data.Row = JsonConvert.DeserializeObject<IList<TableMonitorDataRow>>(json, settings);
+                    data.Row = JsonConvert.DeserializeObject<IList<TableMonitorDataRow>>(json);
                 }
 
                 yield return data;
@@ -106,7 +101,7 @@ namespace Simplic.TableMonitor.Data.DB
                 if (data?.Data != null)
                 {
                     var json = Encoding.UTF8.GetString(data.Data);
-                    data.Row = JsonConvert.DeserializeObject<IList<TableMonitorDataRow>>(json, settings);
+                    data.Row = JsonConvert.DeserializeObject<IList<TableMonitorDataRow>>(json);
                 }
 
                 yield return data;
