@@ -68,9 +68,9 @@ namespace Simplic.TableMonitor.Service
 
                 var statement = $"SELECT string({string.Join(",", primaryKeyNames)}) as primary_key_column, {string.Join(",", columns)} FROM {data.TableName} ORDER BY {string.Join(",", primaryKeyNames)}";
 
-                var enumerator = connection.Query(statement) as IEnumerable<IDictionary<string, object>>;
+                var enumerator = connection.Query(statement);
 
-                foreach (var row in enumerator)
+                foreach (var row in enumerator.Select(x => (IDictionary<string, object>)x))
                 {
                     var hash = GenerateHash(row);
                     var primaryKey = row["primary_key_column"]?.ToString();
