@@ -70,16 +70,18 @@ namespace Simplic.TableMonitor.Service
 
                 var enumerator = connection.Query(statement);
 
-                foreach (var row in enumerator.Select(x => (IDictionary<string, object>)x))
+                foreach (var dapperRow in enumerator.Select(x => (IDictionary<string, object>)x))
                 {
-                    var hash = GenerateHash(row);
-                    var primaryKey = row["primary_key_column"]?.ToString();
+                    var hash = GenerateHash(dapperRow);
+                    var primaryKey = dapperRow["primary_key_column"]?.ToString();
 
                     var existingData = data.Row.FirstOrDefault(x => x.PrimaryKey == primaryKey);
 
                     // Data not found
                     if (existingData == null)
                     {
+                        var row = new Dictionary<string, object>(dapperRow);
+
                         existingData = new TableMonitorDataRow
                         {
                             Hash = hash,
@@ -96,6 +98,8 @@ namespace Simplic.TableMonitor.Service
                     // Data changed
                     else if (hash != existingData.Hash)
                     {
+                        var row = new Dictionary<string, object>(dapperRow);
+
                         existingData.Hash = hash;
                         existingData.Updated = true;
                         existingData.Row = row;
