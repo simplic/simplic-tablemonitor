@@ -43,6 +43,16 @@ namespace Simplic.TableMonitor.Service
         }
 
         /// <summary>
+        /// Wrapt an enumerable of column names in quotes
+        /// </summary>
+        /// <param name="columns">Columns</param>
+        /// <returns>Wraped columns</returns>
+        private IEnumerable<string> WrapInQuotes(IEnumerable<string> columns)
+        {
+            return columns.Select(x => $"\"{x}\"");
+        }
+
+        /// <summary>
         /// Process data
         /// </summary>
         /// <param name="data">Data to process</param>
@@ -70,12 +80,13 @@ namespace Simplic.TableMonitor.Service
                 foreach (var nonePrimaryKey in primaryKeyNames)
                     Console.WriteLine($"Primary key: {nonePrimaryKey}");
 
-                var statement = $"SELECT string({string.Join(",", primaryKeyNames)}) as primary_key_column, {string.Join(",", columns)} FROM {data.TableName} ORDER BY {string.Join(",", primaryKeyNames)}";
+                var statement = $"SELECT string({string.Join(",", WrapInQuotes(primaryKeyNames))}) as primary_key_column, {string.Join(",", WrapInQuotes(columns))} FROM {data.TableName} ORDER BY {string.Join(",", WrapInQuotes(primaryKeyNames))}";
                 int counter = 0;
 
                 try
                 {
                     var enumerator = connection.Query(statement);
+                    Console.WriteLine($"TableMonitor statement: {statement}");
 
                     foreach (var dapperRow in enumerator.Select(x => (IDictionary<string, object>)x))
                     {
