@@ -55,6 +55,15 @@ namespace Simplic.TableMonitor
         } = new List<TableMonitorDataRow>();
 
         /// <summary>
+        /// Gets or sets the connection string name
+        /// </summary>
+        public string ConnectionStringName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the primary key configuration as byte-array
         /// </summary>
         [JsonIgnore]

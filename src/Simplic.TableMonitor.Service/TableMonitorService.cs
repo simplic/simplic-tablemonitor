@@ -64,6 +64,9 @@ namespace Simplic.TableMonitor.Service
             var primaryKeyNames = new List<string>();
             var columns = new List<string>();
 
+            if (string.IsNullOrWhiteSpace(data.ConnectionStringName))
+                data.ConnectionStringName = "default";
+
             sqlService.OpenConnection((connection) =>
             {
                 primaryKeyNames = connection.Query<string>("SELECT cname FROM sys.syscolumns WHERE in_primary_key = 'Y' AND tname = :tableName ORDER BY cname", new { tableName = data.TableName }).ToList();
@@ -174,7 +177,7 @@ namespace Simplic.TableMonitor.Service
 
                     throw new Exception(message, ex);
                 }
-            });
+            }, data.ConnectionStringName);
         }
 
         /// <summary>
