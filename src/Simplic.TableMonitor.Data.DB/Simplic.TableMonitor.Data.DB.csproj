@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Simplic.TableMonitor.Data.DB</RootNamespace>
     <AssemblyName>Simplic.TableMonitor.Data.DB</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,34 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dapper, Version=1.50.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dapper.1.50.5\lib\net451\Dapper.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Simplic.Cache, Version=6.0.18.619, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Simplic.Cache.6.0.18.619\lib\net451\Simplic.Cache.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Simplic.CoreLib, Version=6.14.318.906, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Simplic.CoreLib.6.14.318.906\lib\net451\Simplic.CoreLib.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Simplic.Data, Version=1.5.118.1029, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Simplic.Data.1.5.118.1029\lib\net451\Simplic.Data.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Simplic.Data.Sql, Version=1.13.118.1029, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Simplic.Data.Sql.1.13.118.1029\lib\net451\Simplic.Data.Sql.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Simplic.Sql, Version=6.2.18.926, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Simplic.Sql.6.2.18.926\lib\net451\Simplic.Sql.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -72,15 +45,33 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="package.bat" />
-    <None Include="packages.config" />
-    <None Include="Simplic.TableMonitor.Data.DB.nuspec" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Simplic.TableMonitor\Simplic.TableMonitor.csproj">
       <Project>{F70208F8-B35C-4B3C-817E-64649F00668D}</Project>
       <Name>Simplic.TableMonitor</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>12.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="Simplic.Cache">
+      <Version>6.1.20.217</Version>
+    </PackageReference>
+    <PackageReference Include="Simplic.CoreLib">
+      <Version>6.17.20.322</Version>
+    </PackageReference>
+    <PackageReference Include="Simplic.Data">
+      <Version>1.6.120.322</Version>
+    </PackageReference>
+    <PackageReference Include="Simplic.Data.Sql">
+      <Version>1.14.120.322</Version>
+    </PackageReference>
+    <PackageReference Include="Simplic.Sql">
+      <Version>6.3.20.322</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
